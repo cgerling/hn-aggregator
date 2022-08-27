@@ -66,4 +66,36 @@ defmodule HNAggregator.HackerNews.ItemTest do
       assert reason == :invalid_data
     end
   end
+
+  describe "is_story?/1" do
+    test "should return true when item is a story" do
+      item = %Item{
+        by: "author#{:rand.uniform(1000)}",
+        descendants: :rand.uniform(1000),
+        id: :rand.uniform(1_000_000),
+        score: :rand.uniform(1000),
+        time: DateTime.utc_now() |> DateTime.to_unix(),
+        title: "Hacker News Item Title",
+        type: "story",
+        url: "https://test.local/"
+      }
+
+      assert Item.is_story?(item)
+    end
+
+    test "should return false when item is not a story" do
+      item = %Item{
+        by: "author#{:rand.uniform(1000)}",
+        descendants: :rand.uniform(1000),
+        id: :rand.uniform(1_000_000),
+        score: :rand.uniform(1000),
+        time: DateTime.utc_now() |> DateTime.to_unix(),
+        title: "Hacker News Item Title",
+        type: Enum.random(["job", "comment", "poll", "pollpot"]),
+        url: "https://test.local/"
+      }
+
+      refute Item.is_story?(item)
+    end
+  end
 end

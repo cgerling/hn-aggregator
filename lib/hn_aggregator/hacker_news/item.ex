@@ -49,4 +49,7 @@ defmodule HNAggregator.HackerNews.Item do
   end
 
   defp parse_time(nil), do: {:error, :invalid_time}
+
+  @spec is_story?(t()) :: boolean()
+  def is_story?(%__MODULE__{} = item), do: item.type == "story"
 end
