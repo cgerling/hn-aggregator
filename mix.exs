@@ -26,6 +26,7 @@ defmodule HNAggregator.MixProject do
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.2", only: [:dev], runtime: false},
       {:hackney, "~> 1.18"},
+      {:hammox, "~> 0.7", only: [:test]},
       {:jason, "~> 1.3"},
       {:tesla, "~> 1.4"}
     ]
