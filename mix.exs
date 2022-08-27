@@ -24,7 +24,10 @@ defmodule HNAggregator.MixProject do
   defp deps do
     [
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
-      {:dialyxir, "~> 1.2", only: [:dev], runtime: false}
+      {:dialyxir, "~> 1.2", only: [:dev], runtime: false},
+      {:hackney, "~> 1.18"},
+      {:jason, "~> 1.3"},
+      {:tesla, "~> 1.4"}
     ]
   end
 end
