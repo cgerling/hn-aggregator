@@ -3,6 +3,7 @@ defmodule HNAggregator.HackerNews.HTTPTest do
 
   import Tesla.Mock
 
+  alias HNAggregator.Factory
   alias HNAggregator.HackerNews
   alias HNAggregator.HackerNews.HTTP
   alias HNAggregator.HackerNews.Item
@@ -36,39 +37,24 @@ defmodule HNAggregator.HackerNews.HTTPTest do
 
   describe "item/1" do
     test "should return all properties of a item with the given id", %{item_1: item_1} do
-      by = "author#{:rand.uniform(1000)}"
-      descendants = :rand.uniform(1000)
-      id = :rand.uniform(1_000_000)
-      score = :rand.uniform(1000)
-      time = DateTime.utc_now() |> DateTime.truncate(:second)
-      title = "Hacker News Item Title"
-      type = Enum.random(["job", "story", "comment", "poll", "pollpot"])
-      url = "https://test.local/"
+      data = Factory.build(:item)
 
       mock(fn _ ->
-        body = %{
-          "by" => by,
-          "descendants" => descendants,
-          "id" => id,
-          "score" => score,
-          "time" => DateTime.to_unix(time),
-          "title" => title,
-          "type" => type,
-          "url" => url
-        }
+        params = Factory.to_params(data)
+        body = %{params | "time" => DateTime.to_unix(data.time)}
 
         %Tesla.Env{status: 200, body: body}
       end)
 
-      assert {:ok, %Item{} = item} = item_1.(id)
-      assert item.by == by
-      assert item.descendants == descendants
-      assert item.id == id
-      assert item.score == score
-      assert item.time == time
-      assert item.title == title
-      assert item.type == type
-      assert item.url == url
+      assert {:ok, %Item{} = item} = item_1.(data.id)
+      assert item.by == data.by
+      assert item.descendants == data.descendants
+      assert item.id == data.id
+      assert item.score == data.score
+      assert item.time == data.time
+      assert item.title == data.title
+      assert item.type == data.type
+      assert item.url == data.url
     end
 
     test "should return an error when something goes wrong", %{item_1: item_1} do

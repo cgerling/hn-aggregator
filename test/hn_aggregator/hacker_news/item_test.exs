@@ -1,20 +1,13 @@
 defmodule HNAggregator.HackerNews.ItemTest do
   use ExUnit.Case, async: true
 
+  alias HNAggregator.Factory
   alias HNAggregator.HackerNews.Item
 
   describe "from_data/1" do
     test "should return an ok with an item when map is valid" do
-      data = %{
-        "by" => "author#{:rand.uniform(1000)}",
-        "descendants" => :rand.uniform(1000),
-        "id" => :rand.uniform(1_000_000),
-        "score" => :rand.uniform(1000),
-        "time" => DateTime.utc_now() |> DateTime.to_unix(),
-        "title" => "Hacker News Item Title",
-        "type" => Enum.random(["job", "story", "comment", "poll", "pollpot"]),
-        "url" => "https://test.local/"
-      }
+      data = Factory.params_for(:item)
+      data = %{data | "time" => DateTime.to_unix(data["time"])}
 
       assert {:ok, item = %Item{}} = Item.from_data(data)
       assert item.by == data["by"]
@@ -28,32 +21,16 @@ defmodule HNAggregator.HackerNews.ItemTest do
     end
 
     test "should return an error when time field is nil" do
-      data = %{
-        "by" => "author#{:rand.uniform(1000)}",
-        "descendants" => :rand.uniform(1000),
-        "id" => :rand.uniform(1_000_000),
-        "score" => :rand.uniform(1000),
-        "time" => nil,
-        "title" => "Hacker News Item Title",
-        "type" => Enum.random(["job", "story", "comment", "poll", "pollpot"]),
-        "url" => "https://test.local/"
-      }
+      data = Factory.params_for(:item)
+      data = %{data | "time" => nil}
 
       assert {:error, reason} = Item.from_data(data)
       assert reason == :invalid_time
     end
 
     test "should return an error when time field is invalid" do
-      data = %{
-        "by" => "author#{:rand.uniform(1000)}",
-        "descendants" => :rand.uniform(1000),
-        "id" => :rand.uniform(1_000_000),
-        "score" => :rand.uniform(1000),
-        "time" => 253_402_300_800,
-        "title" => "Hacker News Item Title",
-        "type" => Enum.random(["job", "story", "comment", "poll", "pollpot"]),
-        "url" => "https://test.local/"
-      }
+      data = Factory.params_for(:item)
+      data = %{data | "time" => 253_402_300_800}
 
       assert {:error, reason} = Item.from_data(data)
       assert reason == :invalid_unix_time
@@ -69,33 +46,19 @@ defmodule HNAggregator.HackerNews.ItemTest do
 
   describe "is_story?/1" do
     test "should return true when item is a story" do
-      item = %Item{
-        by: "author#{:rand.uniform(1000)}",
-        descendants: :rand.uniform(1000),
-        id: :rand.uniform(1_000_000),
-        score: :rand.uniform(1000),
-        time: DateTime.utc_now() |> DateTime.to_unix(),
-        title: "Hacker News Item Title",
-        type: "story",
-        url: "https://test.local/"
-      }
+      item = Factory.build(:item, type: "story")
 
       assert Item.is_story?(item)
     end
 
     test "should return false when item is not a story" do
-      item = %Item{
-        by: "author#{:rand.uniform(1000)}",
-        descendants: :rand.uniform(1000),
-        id: :rand.uniform(1_000_000),
-        score: :rand.uniform(1000),
-        time: DateTime.utc_now() |> DateTime.to_unix(),
-        title: "Hacker News Item Title",
-        type: Enum.random(["job", "comment", "poll", "pollpot"]),
-        url: "https://test.local/"
-      }
+      not_story_types = ["job", "comment", "poll", "pollpot"]
 
-      refute Item.is_story?(item)
+      for type <- not_story_types do
+        item = Factory.build(:item, type: type)
+
+        refute Item.is_story?(item)
+      end
     end
   end
 end
