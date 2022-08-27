@@ -4,5 +4,4 @@ defmodule HNAggregator.HTTP do
   use Tesla
 
   plug(Tesla.Middleware.JSON)
-  plug(Tesla.Middleware.Logger)
 end
