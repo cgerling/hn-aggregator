@@ -7,8 +7,6 @@ defmodule HNAggregator.HackerNewsTest do
   alias HNAggregator.HackerNews
   alias HNAggregator.HackerNews.Item
 
-  defmock(HackerNews.Mock, for: HackerNews.Behaviour)
-
   describe "top_stories/0" do
     test "should return a list with stories from the top stories" do
       top_stories_amount = 500
