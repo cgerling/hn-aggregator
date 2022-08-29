@@ -1,11 +1,19 @@
 defmodule HNAggregator.HackerNewsTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
 
   import Mox
 
   alias HNAggregator.Factory
   alias HNAggregator.HackerNews
   alias HNAggregator.HackerNews.Item
+
+  setup do
+    hacker_news_mod = Application.get_env(:hn_aggregator, :hacker_news)
+
+    Application.put_env(:hn_aggregator, :hacker_news, HNAggregator.HackerNews.Mock)
+
+    on_exit(fn -> Application.put_env(:hn_aggregator, :hacker_news, hacker_news_mod) end)
+  end
 
   describe "top_stories/0" do
     test "should return a list with stories from the top stories" do
