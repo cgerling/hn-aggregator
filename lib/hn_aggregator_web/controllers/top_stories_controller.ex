@@ -1,7 +1,10 @@
 defmodule HNAggregatorWeb.TopStoriesController do
   use HNAggregatorWeb, :controller
 
+  alias HNAggregator.HackerNews.Item
   alias HNAggregator.TopStories
+
+  action_fallback HNAggregatorWeb.TopStoriesFallbackController
 
   @page_size 10
 
@@ -15,5 +18,15 @@ defmodule HNAggregatorWeb.TopStoriesController do
     |> put_status(:ok)
     |> render("index.json", top_stories: top_stories)
   end
+
+  @spec show(Plug.Conn.t(), map()) :: Plug.Conn.t()
+  def show(conn, params) do
+    id = params |> Map.fetch!("id") |> String.to_integer()
+
+    with %Item{} = story <- TopStories.get(id) do
+      conn
+      |> put_status(:ok)
+      |> render("show.json", story: story)
+    end
   end
 end

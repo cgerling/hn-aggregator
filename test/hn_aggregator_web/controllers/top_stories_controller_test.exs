@@ -13,6 +13,16 @@ defmodule HNAggregatorWeb.TopStoriesControllerTest do
   end
 
   describe "GET /top-stories" do
+    test "should return a list of stories", %{conn: conn} do
+      assert response =
+               conn
+               |> get(Routes.top_stories_path(conn, :index))
+               |> json_response(:ok)
+
+      expected_keys = ["by", "descendants", "id", "score", "time", "title", "url"]
+      assert Enum.all?(response, &(Map.keys(&1) == expected_keys))
+    end
+
     test "should return a list with the stories of the first page", %{conn: conn} do
       assert response =
                conn
@@ -47,6 +57,34 @@ defmodule HNAggregatorWeb.TopStoriesControllerTest do
                |> json_response(:ok)
 
       assert response == []
+    end
+  end
+
+  describe "GET /top-stories/:id" do
+    test "should return a story with the given id", %{conn: conn} do
+      id = Enum.random(1..50)
+
+      assert response =
+               conn
+               |> get(Routes.top_stories_path(conn, :show, id))
+               |> json_response(:ok)
+
+      expected_keys = ["by", "descendants", "id", "score", "time", "title", "url"]
+      assert response["id"] == id
+      assert Map.keys(response) == expected_keys
+    end
+
+    test "should return a not found error when no story with the given id was found", %{
+      conn: conn
+    } do
+      id = 51
+
+      assert response =
+               conn
+               |> get(Routes.top_stories_path(conn, :show, id))
+               |> json_response(:not_found)
+
+      assert response["message"] == "Not Found"
     end
   end
 end
