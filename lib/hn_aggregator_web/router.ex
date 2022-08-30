@@ -7,5 +7,7 @@ defmodule HNAggregatorWeb.Router do
 
   scope "/", HNAggregatorWeb do
     pipe_through :api
+
+    resources "/top-stories", TopStoriesController, only: [:index]
   end
 end
