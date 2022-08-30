@@ -32,6 +32,8 @@ defmodule HNAggregator.MixProject do
       {:hackney, "~> 1.18"},
       {:hammox, "~> 0.7", only: [:test]},
       {:jason, "~> 1.3"},
+      {:phoenix, "~> 1.6"},
+      {:plug_cowboy, "~> 2.5"},
       {:tesla, "~> 1.4"}
     ]
   end
