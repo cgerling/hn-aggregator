@@ -162,7 +162,7 @@
           ## Experimental
           #
           {Credo.Check.Consistency.MultiAliasImportRequireUse, []},
-          {Credo.Check.Readability.AliasAs, []},
+          {Credo.Check.Readability.AliasAs, false},
           {Credo.Check.Readability.ImplTrue, []},
           {Credo.Check.Readability.MultiAlias, []},
           {Credo.Check.Readability.SeparateAliasRequire, []},
