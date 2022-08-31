@@ -3,14 +3,15 @@ defmodule HNAggregator.TopStoriesTest do
 
   alias HNAggregator.Factory
   alias HNAggregator.HackerNews.Item
+  alias HNAggregator.PubSub
   alias HNAggregator.TopStories
 
   @top_stories Enum.map(1..10, &Factory.build(:item, id: &1, type: "story"))
 
   setup_all do
-    send(TopStories.DataStore, {:update, @top_stories})
+    PubSub.publish(@top_stories)
 
-    on_exit(fn -> send(TopStories.DataStore, {:update, []}) end)
+    on_exit(fn -> PubSub.publish([]) end)
     :ok
   end
 

@@ -9,6 +9,7 @@ defmodule HNAggregator.TopStories.DataStore do
 
   use GenServer
 
+  alias HNAggregator.PubSub
   alias HNAggregator.TopStories.DataStore.State
 
   require Logger
@@ -21,6 +22,7 @@ defmodule HNAggregator.TopStories.DataStore do
 
   @impl GenServer
   def init(_) do
+    PubSub.subscribe()
     state = State.new()
 
     {:ok, state}
@@ -40,7 +42,7 @@ defmodule HNAggregator.TopStories.DataStore do
   end
 
   @impl GenServer
-  def handle_info({:update, top_stories}, _state) do
+  def handle_info({:pub_sub, {:message, top_stories}}, _state) do
     state = State.new(top_stories)
 
     {:noreply, state}
