@@ -11,13 +11,14 @@ defmodule HNAggregator.MixProject do
       deps: deps(),
       dialyzer: [
         plt_file: {:no_warn, "priv/plts/dialyzer.plt"}
-      ]
+      ],
+      releases: releases()
     ]
   end
 
   def application do
     [
-      extra_applications: [:logger],
+      extra_applications: [:logger, :runtime_tools],
       mod: {HNAggregator, []}
     ]
   end
@@ -35,6 +36,16 @@ defmodule HNAggregator.MixProject do
       {:phoenix, "~> 1.6"},
       {:plug_cowboy, "~> 2.5"},
       {:tesla, "~> 1.4"}
+    ]
+  end
+
+  def releases do
+    [
+      hn_aggregator: [
+        include_erts: true,
+        include_executables_for: [:unix],
+        applications: [runtime_tools: :permanent]
+      ]
     ]
   end
 end
