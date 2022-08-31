@@ -1,4 +1,4 @@
-defmodule HNAggregator.PubSub.State do
+defmodule HNAggregator.TopStories.PubSub.State do
   @moduledoc """
   Module to define the state of the `HNAggregator.PubSub` process as well as
   functions to interact with such state.

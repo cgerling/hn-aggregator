@@ -1,7 +1,7 @@
-defmodule HNAggregator.PubSub.StateTest do
+defmodule HNAggregator.TopStories.PubSub.StateTest do
   use ExUnit.Case, async: true
 
-  alias HNAggregator.PubSub.State
+  alias HNAggregator.TopStories.PubSub.State
 
   describe "new/0" do
     test "should return a state struct with default values" do

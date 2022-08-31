@@ -1,10 +1,10 @@
-defmodule HNAggregator.PubSub do
+defmodule HNAggregator.TopStories.PubSub do
   @moduledoc """
   A simple PubSub module to faciliate the communication between multiple
   components.
   """
 
-  @server HNAggregator.PubSub.Server
+  @server HNAggregator.TopStories.PubSub.Server
 
   @spec subscribe() :: :ok
   def subscribe do

@@ -1,9 +1,9 @@
-defmodule HNAggregator.PubSub.Server do
+defmodule HNAggregator.TopStories.PubSub.Server do
   @moduledoc false
 
   use GenServer
 
-  alias HNAggregator.PubSub.State
+  alias HNAggregator.TopStories.PubSub.State
 
   @spec start_link(Keyword.t()) :: GenServer.on_start()
   def start_link(options) do

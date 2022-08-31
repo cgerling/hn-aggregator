@@ -9,8 +9,8 @@ defmodule HNAggregator.TopStories.DataStore do
 
   use GenServer
 
-  alias HNAggregator.PubSub
   alias HNAggregator.TopStories.DataStore.State
+  alias HNAggregator.TopStories.PubSub
 
   require Logger
 

@@ -5,8 +5,8 @@ defmodule HNAggregator.TopStories.PollerTest do
 
   alias HNAggregator.Factory
   alias HNAggregator.HackerNews
-  alias HNAggregator.PubSub
   alias HNAggregator.TopStories.Poller
+  alias HNAggregator.TopStories.PubSub
 
   setup do
     hacker_news_mod = Application.get_env(:hn_aggregator, :hacker_news)

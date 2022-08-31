@@ -6,7 +6,6 @@ defmodule HNAggregator do
   @impl Application
   def start(_type, _args) do
     children = [
-      HNAggregator.PubSub.Server,
       HNAggregator.TopStories.Supervisor,
       HNAggregatorWeb.Endpoint
     ]

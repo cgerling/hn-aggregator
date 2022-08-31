@@ -1,8 +1,8 @@
 defmodule HNAggregatorWeb.TopStoriesSocket do
   @behaviour Phoenix.Socket.Transport
 
-  alias HNAggregator.PubSub
   alias HNAggregator.TopStories
+  alias HNAggregator.TopStories.PubSub
   alias HNAggregatorWeb.TopStoriesView
   alias Phoenix.Socket.Transport
 

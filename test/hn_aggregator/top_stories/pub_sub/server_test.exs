@@ -1,8 +1,8 @@
-defmodule HNAggregator.PubSub.ServerTest do
+defmodule HNAggregator.TopStories.PubSub.ServerTest do
   use ExUnit.Case, async: true
 
-  alias HNAggregator.PubSub.Server
-  alias HNAggregator.PubSub.State
+  alias HNAggregator.TopStories.PubSub.Server
+  alias HNAggregator.TopStories.PubSub.State
 
   setup context do
     name = context.test

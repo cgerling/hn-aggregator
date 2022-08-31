@@ -13,8 +13,9 @@ defmodule HNAggregator.TopStories.Supervisor do
   @impl Supervisor
   def init(_) do
     children = [
-      TopStories.DataStore,
-      {TopStories.Poller, target: TopStories.DataStore}
+      TopStories.PubSub.Server,
+      TopStories.Poller,
+      TopStories.DataStore
     ]
 
     opts = [strategy: :one_for_one]

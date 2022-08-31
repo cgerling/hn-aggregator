@@ -1,7 +1,7 @@
-defmodule HNAggregator.PubSubTest do
+defmodule HNAggregator.TopStories.PubSubTest do
   use ExUnit.Case, async: false
 
-  alias HNAggregator.PubSub
+  alias HNAggregator.TopStories.PubSub
 
   describe "subscribe/0" do
     test "should register current process as a listener" do

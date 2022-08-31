@@ -3,9 +3,9 @@ defmodule HNAggregator.TopStories.DataStoreTest do
 
   alias HNAggregator.Factory
   alias HNAggregator.HackerNews.Item
-  alias HNAggregator.PubSub
   alias HNAggregator.TopStories.DataStore
   alias HNAggregator.TopStories.DataStore.State
+  alias HNAggregator.TopStories.PubSub
 
   setup context do
     name = context.test

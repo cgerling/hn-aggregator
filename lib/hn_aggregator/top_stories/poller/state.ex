@@ -5,7 +5,7 @@ defmodule HNAggregator.TopStories.Poller.State do
   """
 
   alias HNAggregator.HackerNews
-  alias HNAggregator.PubSub
+  alias HNAggregator.TopStories.PubSub
 
   @type t :: %__MODULE__{
           rate: pos_integer()

@@ -5,8 +5,8 @@ defmodule HNAggregator.TopStories.Poller.StateTest do
 
   alias HNAggregator.Factory
   alias HNAggregator.HackerNews
-  alias HNAggregator.PubSub
   alias HNAggregator.TopStories.Poller.State
+  alias HNAggregator.TopStories.PubSub
 
   describe "new/1" do
     test "should return a state struct with default values" do

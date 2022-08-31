@@ -3,8 +3,8 @@ defmodule HNAggregator.TopStoriesTest do
 
   alias HNAggregator.Factory
   alias HNAggregator.HackerNews.Item
-  alias HNAggregator.PubSub
   alias HNAggregator.TopStories
+  alias HNAggregator.TopStories.PubSub
 
   @top_stories Enum.map(1..10, &Factory.build(:item, id: &1, type: "story"))
 

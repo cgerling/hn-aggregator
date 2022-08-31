@@ -2,7 +2,7 @@ defmodule HNAggregatorWeb.TopStoriesSocketTest do
   use ExUnit.Case, async: true
 
   alias HNAggregator.Factory
-  alias HNAggregator.PubSub
+  alias HNAggregator.TopStories.PubSub
   alias HNAggregatorWeb.TopStoriesSocket
 
   describe "init/1" do
