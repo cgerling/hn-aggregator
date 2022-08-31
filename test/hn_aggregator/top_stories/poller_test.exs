@@ -5,6 +5,7 @@ defmodule HNAggregator.TopStories.PollerTest do
 
   alias HNAggregator.Factory
   alias HNAggregator.HackerNews
+  alias HNAggregator.PubSub
   alias HNAggregator.TopStories.Poller
 
   setup do
@@ -32,9 +33,11 @@ defmodule HNAggregator.TopStories.PollerTest do
       {:ok, item}
     end)
 
-    start_supervised!({Poller, name: context.test, target: self()})
+    PubSub.subscribe()
 
-    assert_receive {:update, ^top_stories}
+    start_supervised!({Poller, name: context.test})
+
+    assert_receive {:pub_sub, {:message, _}}
   end
 
   test "should fetch new top stories after the configured rate interval", context do
@@ -48,13 +51,15 @@ defmodule HNAggregator.TopStories.PollerTest do
       {:ok, item}
     end)
 
-    rate = 200
-    start_supervised!({Poller, name: context.test, target: self(), rate: rate})
+    PubSub.subscribe()
 
-    assert_receive {:update, _}
+    rate = 200
+    start_supervised!({Poller, name: context.test, rate: rate})
+
+    assert_receive {:pub_sub, {:message, _}}
 
     Process.sleep(rate)
 
-    assert_receive {:update, _}
+    assert_receive {:pub_sub, {:message, _}}
   end
 end

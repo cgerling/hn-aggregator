@@ -5,23 +5,22 @@ defmodule HNAggregator.TopStories.Poller.StateTest do
 
   alias HNAggregator.Factory
   alias HNAggregator.HackerNews
+  alias HNAggregator.PubSub
   alias HNAggregator.TopStories.Poller.State
 
   describe "new/1" do
     test "should return a state struct with default values" do
-      state = State.new(target: TargetModule)
+      state = State.new([])
 
       assert %State{} = state
-      assert state.target == TargetModule
       assert state.rate == 5 * 60 * 1000
     end
 
     test "should return a state struct with the given rate" do
       rate = :rand.uniform(10_000)
-      state = State.new(target: TargetModule, rate: rate)
+      state = State.new(rate: rate)
 
       assert %State{} = state
-      assert state.target == TargetModule
       assert state.rate == rate
     end
   end
@@ -36,7 +35,7 @@ defmodule HNAggregator.TopStories.Poller.StateTest do
       :ok
     end
 
-    test "should send a update message with the fetched top stories to the configured target" do
+    test "should publish the fetched top stories into the pub sub" do
       top_stories = Enum.map(1..10, &Factory.build(:item, id: &1, type: "story"))
 
       expect(HackerNews.Mock, :top_stories, 1, fn ->
@@ -49,10 +48,12 @@ defmodule HNAggregator.TopStories.Poller.StateTest do
         {:ok, item}
       end)
 
-      state = State.new(target: self())
+      PubSub.subscribe()
+
+      state = State.new([])
       State.fetch_data(state)
 
-      assert_receive {:update, ^top_stories}
+      assert_receive {:pub_sub, {:message, ^top_stories}}
     end
   end
 end
