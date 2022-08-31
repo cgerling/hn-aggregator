@@ -16,13 +16,13 @@ defmodule HNAggregatorWeb.TopStoriesSocket do
   end
 
   @impl Transport
-  def init(state) do
-    TopStories.watch()
+  def init(_state) do
+    {:ok, watch_ref} = TopStories.watch()
 
     TopStories.all()
     |> push()
 
-    {:ok, state}
+    {:ok, %{watch_ref: watch_ref}}
   end
 
   @impl Transport
@@ -55,7 +55,8 @@ defmodule HNAggregatorWeb.TopStoriesSocket do
   end
 
   @impl Transport
-  def terminate(_reason, _state) do
+  def terminate(_reason, state) do
+    TopStories.unwatch(state.watch_ref)
     :ok
   end
 end
