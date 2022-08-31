@@ -5,14 +5,12 @@ defmodule HNAggregator.TopStories.Poller do
 
   ## Options
   * name - defines the name of the process
-  * target - defines to which process the pulled data will be sent
   * rate - defined the interval rate that the pull operation occurs in
   milliseconds, when not specified the default interval is 5 minutes
   """
 
   use GenServer
 
-  alias HNAggregator.HackerNews
   alias HNAggregator.TopStories.Poller.State
 
   require Logger
@@ -26,18 +24,15 @@ defmodule HNAggregator.TopStories.Poller do
 
   @impl GenServer
   def init(options) do
-    send(self(), :refresh)
+    send(self(), :fetch_data)
 
     state = State.new(options)
     {:ok, state}
   end
 
   @impl GenServer
-  def handle_info(:refresh, state) do
-    top_stories = HackerNews.top_stories()
-
-    send(state.target, {:update, top_stories})
-    Process.send_after(self(), :refresh, state.rate)
+  def handle_info(:fetch_data, state) do
+    State.fetch_data(state)
 
     {:noreply, state}
   end

@@ -4,6 +4,8 @@ defmodule HNAggregator.TopStories.Poller.State do
   as well as functions to interact with such state.
   """
 
+  alias HNAggregator.HackerNews
+
   @type t :: %__MODULE__{
           target: Process.dest(),
           rate: pos_integer()
@@ -23,5 +25,16 @@ defmodule HNAggregator.TopStories.Poller.State do
       target: target,
       rate: rate
     }
+  end
+
+  @spec fetch_data(t()) :: t()
+  def fetch_data(%__MODULE__{} = state) do
+    HackerNews.top_stories()
+    |> PubSub.publish()
+
+    send(state.target, {:update, top_stories})
+    Process.send_after(self(), :fetch_data, state.rate)
+
+    state
   end
 end
