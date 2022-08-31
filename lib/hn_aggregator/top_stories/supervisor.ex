@@ -13,7 +13,7 @@ defmodule HNAggregator.TopStories.Supervisor do
   @impl Supervisor
   def init(_) do
     children = [
-      TopStories.PubSub.Server,
+      TopStories.PubSub,
       TopStories.Poller,
       TopStories.DataStore
     ]

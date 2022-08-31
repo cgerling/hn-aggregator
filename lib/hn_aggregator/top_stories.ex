@@ -6,7 +6,7 @@ defmodule HNAggregator.TopStories do
   alias HNAggregator.HackerNews.Item
 
   @data_store HNAggregator.TopStories.DataStore
-  @pub_sub HNAggregator.TopStories.PubSub.Server
+  @pub_sub HNAggregator.TopStories.PubSub
 
   @spec all() :: list(Item.t())
   @spec all(Keyword.t()) :: list(Item.t())

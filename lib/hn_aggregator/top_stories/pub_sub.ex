@@ -1,23 +1,46 @@
 defmodule HNAggregator.TopStories.PubSub do
-  @moduledoc """
-  A simple PubSub module to faciliate the communication between multiple
-  components.
-  """
+  @moduledoc false
 
-  @server HNAggregator.TopStories.PubSub.Server
+  use GenServer
 
-  @spec subscribe() :: :ok
-  def subscribe do
-    GenServer.call(@server, :subscribe)
+  alias HNAggregator.TopStories.PubSub.State
+
+  @spec start_link(Keyword.t()) :: GenServer.on_start()
+  def start_link(options) do
+    name = Keyword.get(options, :name, __MODULE__)
+    GenServer.start_link(__MODULE__, [], name: name)
   end
 
-  @spec publish(term()) :: :ok
-  def publish(data) do
-    GenServer.call(@server, {:publish, data})
+  @impl GenServer
+  def init(_) do
+    state = State.new()
+
+    {:ok, state}
   end
 
-  @spec listeners() :: list(Process.dest())
-  def listeners do
-    GenServer.call(@server, :listeners)
+  @impl GenServer
+  def handle_call(:subscribe, {from_pid, _}, state) do
+    state = State.subscribe(state, from_pid)
+
+    {:reply, :ok, state}
+  end
+
+  def handle_call({:publish, data}, _from, state) do
+    state = State.publish(state, data)
+
+    {:reply, :ok, state}
+  end
+
+  def handle_call(:listeners, _from, state) do
+    listeners = State.listeners(state)
+
+    {:reply, listeners, state}
+  end
+
+  @impl GenServer
+  def handle_info({:DOWN, reference, :process, _object, _reason}, state) do
+    state = State.unsubscribe(state, reference)
+
+    {:noreply, state}
   end
 end

@@ -1,45 +1,57 @@
 defmodule HNAggregator.TopStories.PubSubTest do
-  use ExUnit.Case, async: false
+  use ExUnit.Case, async: true
 
   alias HNAggregator.TopStories.PubSub
+  alias HNAggregator.TopStories.PubSub.State
 
-  describe "subscribe/0" do
-    test "should register current process as a listener" do
-      assert :ok == PubSub.subscribe()
+  setup context do
+    name = context.test
+    start_supervised!({PubSub, name: name})
 
-      listeners = PubSub.listeners()
-
-      assert Enum.any?(listeners, &(&1 == self()))
-    end
+    %{pub_sub: name}
   end
 
-  describe "publish/1" do
-    test "should send a message to all registered listeners" do
-      PubSub.subscribe()
+  test "should register client process as a listener", %{pub_sub: pub_sub} do
+    GenServer.call(pub_sub, :subscribe)
 
-      assert PubSub.publish("test message") == :ok
-      assert_receive {:pub_sub, {:message, "test message"}}
-    end
+    process = self()
+    assert %State{listeners: [{^process, _monitor_ref}]} = :sys.get_state(pub_sub)
   end
 
-  describe "listeners/0" do
-    test "should return all processes registered as listeners" do
-      subscribe_fn = fn ->
-        PubSub.subscribe()
+  test "should send a message to all registered listeners", %{pub_sub: pub_sub} do
+    GenServer.call(pub_sub, :subscribe)
+    GenServer.call(pub_sub, {:publish, "test message"})
+
+    assert_received {:pub_sub, {:message, "test message"}}
+  end
+
+  test "should return all processes registered as listeners", %{pub_sub: pub_sub} do
+    subscribe_fn = fn ->
+      GenServer.call(pub_sub, :subscribe)
+      Process.sleep(1000)
+    end
+
+    process_a = spawn(subscribe_fn)
+    process_b = spawn(subscribe_fn)
+
+    Process.sleep(50)
+
+    listeners = GenServer.call(pub_sub, :listeners)
+    assert Enum.any?(listeners, &(&1 == process_a))
+    assert Enum.any?(listeners, &(&1 == process_b))
+  end
+
+  test "should unsubscribe client process after it dies", %{pub_sub: pub_sub} do
+    process =
+      spawn(fn ->
+        GenServer.call(pub_sub, :subscribe)
         Process.sleep(1000)
-      end
+      end)
 
-      process_a = spawn(subscribe_fn)
-      process_b = spawn(subscribe_fn)
+    Process.exit(process, :kill)
 
-      Process.sleep(50)
+    Process.sleep(50)
 
-      listeners = PubSub.listeners()
-      assert Enum.any?(listeners, &(&1 == process_a))
-      assert Enum.any?(listeners, &(&1 == process_b))
-
-      Process.exit(process_a, :kill)
-      Process.exit(process_b, :kill)
-    end
+    assert :sys.get_state(pub_sub) == State.new()
   end
 end
