@@ -31,7 +31,7 @@ defmodule HNAggregatorWeb.TopStoriesSocket do
   end
 
   @impl Transport
-  def handle_info({:pub_sub, {:message, top_stories}}, state) do
+  def handle_info({:watch, {:top_stories, top_stories}}, state) do
     push(top_stories)
 
     {:ok, state}

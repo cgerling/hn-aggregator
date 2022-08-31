@@ -4,54 +4,54 @@ defmodule HNAggregator.TopStories.PubSub.State do
   functions to interact with such state.
   """
 
-  @type listener :: {Process.dest(), reference()}
+  @type watcher :: {Process.dest(), reference()}
   @type t :: %__MODULE__{
-          listeners: list(listener())
+          watchers: list(watcher())
         }
 
-  @enforce_keys [:listeners]
+  @enforce_keys [:watchers]
   defstruct @enforce_keys
 
   @spec new() :: t()
   def new do
     %__MODULE__{
-      listeners: []
+      watchers: []
     }
   end
 
-  @spec subscribe(t(), Process.dest()) :: t()
-  def subscribe(%__MODULE__{} = state, process) do
-    already_subscribed? = Enum.any?(state.listeners, fn {listener, _} -> process == listener end)
+  @spec watch(t(), Process.dest()) :: t()
+  def watch(%__MODULE__{} = state, process) do
+    already_watching? = Enum.any?(state.watchers, fn {watcher, _} -> process == watcher end)
 
-    if already_subscribed? do
+    if already_watching? do
       state
     else
       monitor_ref = Process.monitor(process)
-      new_listener = {process, monitor_ref}
+      new_watcher = {process, monitor_ref}
 
-      %{state | listeners: [new_listener | state.listeners]}
+      %{state | watchers: [new_watcher | state.watchers]}
     end
   end
 
-  @spec unsubscribe(t(), reference()) :: t()
-  def unsubscribe(%__MODULE__{} = state, reference) do
-    listeners =
-      Enum.reject(state.listeners, fn {_process, monitor_ref} -> monitor_ref == reference end)
+  @spec unwatch(t(), reference()) :: t()
+  def unwatch(%__MODULE__{} = state, reference) do
+    watchers =
+      Enum.reject(state.watchers, fn {_process, monitor_ref} -> monitor_ref == reference end)
 
-    %{state | listeners: listeners}
+    %{state | watchers: watchers}
   end
 
-  @spec publish(t(), term()) :: t()
-  def publish(%__MODULE__{} = state, data) do
-    Enum.each(state.listeners, fn {process, _} ->
-      send(process, {:pub_sub, {:message, data}})
+  @spec publish_change(t(), term()) :: t()
+  def publish_change(%__MODULE__{} = state, data) do
+    Enum.each(state.watchers, fn {process, _} ->
+      send(process, {:watch, {:top_stories, data}})
     end)
 
     state
   end
 
-  @spec listeners(t()) :: list(Process.dest())
-  def listeners(%__MODULE__{} = state) do
-    Enum.map(state.listeners, fn {process, _} -> process end)
+  @spec watchers(t()) :: list(Process.dest())
+  def watchers(%__MODULE__{} = state) do
+    Enum.map(state.watchers, fn {process, _} -> process end)
   end
 end

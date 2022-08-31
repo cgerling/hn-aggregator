@@ -30,7 +30,7 @@ defmodule HNAggregatorWeb.TopStoriesSocketTest do
   describe "handle_info/2" do
     test "should send a push message to send new stories to client when top stories are updated" do
       story = Factory.build(:item, type: "story")
-      TopStoriesSocket.handle_info({:pub_sub, {:message, [story]}}, %{})
+      TopStoriesSocket.handle_info({:watch, {:top_stories, [story]}}, %{})
 
       assert_receive {:push, [^story]}
     end

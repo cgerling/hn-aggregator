@@ -11,23 +11,23 @@ defmodule HNAggregator.TopStories.PubSubTest do
     %{pub_sub: name}
   end
 
-  test "should register client process as a listener", %{pub_sub: pub_sub} do
-    GenServer.call(pub_sub, :subscribe)
+  test "should register client process as a watcher", %{pub_sub: pub_sub} do
+    GenServer.call(pub_sub, :watch)
 
     process = self()
-    assert %State{listeners: [{^process, _monitor_ref}]} = :sys.get_state(pub_sub)
+    assert %State{watchers: [{^process, _monitor_ref}]} = :sys.get_state(pub_sub)
   end
 
-  test "should send a message to all registered listeners", %{pub_sub: pub_sub} do
-    GenServer.call(pub_sub, :subscribe)
-    GenServer.call(pub_sub, {:publish, "test message"})
+  test "should send a message to all registered watchers", %{pub_sub: pub_sub} do
+    GenServer.call(pub_sub, :watch)
+    GenServer.call(pub_sub, {:publish_change, "test message"})
 
-    assert_received {:pub_sub, {:message, "test message"}}
+    assert_received {:watch, {:top_stories, "test message"}}
   end
 
-  test "should return all processes registered as listeners", %{pub_sub: pub_sub} do
+  test "should return all processes registered as watchers", %{pub_sub: pub_sub} do
     subscribe_fn = fn ->
-      GenServer.call(pub_sub, :subscribe)
+      GenServer.call(pub_sub, :watch)
       Process.sleep(1000)
     end
 
@@ -36,15 +36,15 @@ defmodule HNAggregator.TopStories.PubSubTest do
 
     Process.sleep(50)
 
-    listeners = GenServer.call(pub_sub, :listeners)
-    assert Enum.any?(listeners, &(&1 == process_a))
-    assert Enum.any?(listeners, &(&1 == process_b))
+    watchers = GenServer.call(pub_sub, :watchers)
+    assert Enum.any?(watchers, &(&1 == process_a))
+    assert Enum.any?(watchers, &(&1 == process_b))
   end
 
   test "should unsubscribe client process after it dies", %{pub_sub: pub_sub} do
     process =
       spawn(fn ->
-        GenServer.call(pub_sub, :subscribe)
+        GenServer.call(pub_sub, :watch)
         Process.sleep(1000)
       end)
 

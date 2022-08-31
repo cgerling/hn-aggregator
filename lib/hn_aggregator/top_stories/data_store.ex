@@ -42,7 +42,7 @@ defmodule HNAggregator.TopStories.DataStore do
   end
 
   @impl GenServer
-  def handle_info({:pub_sub, {:message, top_stories}}, _state) do
+  def handle_info({:watch, {:top_stories, top_stories}}, _state) do
     state = State.new(top_stories)
 
     {:noreply, state}

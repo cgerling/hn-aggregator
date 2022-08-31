@@ -8,74 +8,74 @@ defmodule HNAggregator.TopStories.PubSub.StateTest do
       state = State.new()
 
       assert %State{} = state
-      assert state.listeners == []
+      assert state.watchers == []
     end
   end
 
-  describe "subscribe/2" do
-    test "should return a new state with the given process as a listener" do
+  describe "watch/2" do
+    test "should return a new state with the given process as a watcher" do
       state = State.new()
       process = spawn(fn -> Process.sleep(100) end)
-      state = State.subscribe(state, process)
+      state = State.watch(state, process)
 
-      assert [{listener, monitor_ref}] = state.listeners
-      assert listener == process
+      assert [{watcher, monitor_ref}] = state.watchers
+      assert watcher == process
       assert is_reference(monitor_ref)
     end
 
     test "should create a monitor reference off the given process" do
       state = State.new()
       process = spawn(fn -> Process.sleep(100) end)
-      State.subscribe(state, process)
+      State.watch(state, process)
 
       assert Process.info(process, :monitored_by) == {:monitored_by, [self()]}
     end
 
-    test "should not create duplicated entries when process tries to subscribe more than once" do
+    test "should not create duplicated entries when process tries to watch more than once" do
       state = State.new()
       process = spawn(fn -> Process.sleep(1000) end)
 
       state =
         state
-        |> State.subscribe(process)
-        |> State.subscribe(process)
+        |> State.watch(process)
+        |> State.watch(process)
 
-      assert State.listeners(state) == [process]
+      assert State.watchers(state) == [process]
     end
   end
 
-  describe "unsubscribe/2" do
-    test "should return a new state with the given process removed from listeners" do
+  describe "unwatch/2" do
+    test "should return a new state with the given process removed from watchers" do
       state = State.new()
       process = spawn(fn -> Process.sleep(100) end)
-      state = State.subscribe(state, process)
+      state = State.watch(state, process)
 
-      [{_, monitor_ref}] = state.listeners
-      state = State.unsubscribe(state, monitor_ref)
+      [{_, monitor_ref}] = state.watchers
+      state = State.unwatch(state, monitor_ref)
 
-      assert state.listeners == []
+      assert state.watchers == []
     end
   end
 
   describe "publish/2" do
-    test "should send a message for all current listeners" do
+    test "should send a message for all current watchers" do
       state = State.new()
       process = self()
-      state = State.subscribe(state, process)
+      state = State.watch(state, process)
 
-      State.publish(state, "test message")
+      State.publish_change(state, "test message")
 
-      assert_received {:pub_sub, {:message, "test message"}}
+      assert_received {:watch, {:top_stories, "test message"}}
     end
   end
 
-  describe "listeners/1" do
-    test "should return a list with all processes registered as listeners" do
+  describe "watchers/1" do
+    test "should return a list with all processes registered as watchers" do
       state = State.new()
       process = self()
-      state = State.subscribe(state, process)
+      state = State.watch(state, process)
 
-      assert State.listeners(state) == [process]
+      assert State.watchers(state) == [process]
     end
   end
 end

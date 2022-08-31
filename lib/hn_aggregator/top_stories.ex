@@ -21,16 +21,16 @@ defmodule HNAggregator.TopStories do
 
   @spec update_stories(list(Item.t())) :: :ok
   def update_stories(top_stories) when is_list(top_stories) do
-    GenServer.call(@pub_sub, {:publish, top_stories})
+    GenServer.call(@pub_sub, {:publish_change, top_stories})
   end
 
   @spec watch() :: :ok
   def watch do
-    GenServer.call(@pub_sub, :subscribe)
+    GenServer.call(@pub_sub, :watch)
   end
 
   @spec watchers() :: list(Process.dest())
   def watchers do
-    GenServer.call(@pub_sub, :listeners)
+    GenServer.call(@pub_sub, :watchers)
   end
 end

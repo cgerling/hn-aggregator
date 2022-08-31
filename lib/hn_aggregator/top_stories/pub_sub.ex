@@ -19,27 +19,27 @@ defmodule HNAggregator.TopStories.PubSub do
   end
 
   @impl GenServer
-  def handle_call(:subscribe, {from_pid, _}, state) do
-    state = State.subscribe(state, from_pid)
+  def handle_call(:watch, {from_pid, _}, state) do
+    state = State.watch(state, from_pid)
 
     {:reply, :ok, state}
   end
 
-  def handle_call({:publish, data}, _from, state) do
-    state = State.publish(state, data)
+  def handle_call({:publish_change, data}, _from, state) do
+    state = State.publish_change(state, data)
 
     {:reply, :ok, state}
   end
 
-  def handle_call(:listeners, _from, state) do
-    listeners = State.listeners(state)
+  def handle_call(:watchers, _from, state) do
+    watchers = State.watchers(state)
 
-    {:reply, listeners, state}
+    {:reply, watchers, state}
   end
 
   @impl GenServer
   def handle_info({:DOWN, reference, :process, _object, _reason}, state) do
-    state = State.unsubscribe(state, reference)
+    state = State.unwatch(state, reference)
 
     {:noreply, state}
   end

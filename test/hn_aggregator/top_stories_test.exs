@@ -53,7 +53,7 @@ defmodule HNAggregator.TopStoriesTest do
 
       stories = @top_stories
       assert TopStories.update_stories(stories) == :ok
-      assert_receive {:pub_sub, {:message, ^stories}}
+      assert_receive {:watch, {:top_stories, ^stories}}
     end
   end
 

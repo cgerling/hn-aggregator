@@ -53,7 +53,7 @@ defmodule HNAggregator.TopStories.Poller.StateTest do
       state = State.new([])
       State.fetch_data(state)
 
-      assert_receive {:pub_sub, {:message, ^top_stories}}
+      assert_receive {:watch, {:top_stories, ^top_stories}}
     end
   end
 end
