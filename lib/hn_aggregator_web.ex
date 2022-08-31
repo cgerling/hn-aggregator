@@ -12,6 +12,15 @@ defmodule HNAggregatorWeb do
     end
   end
 
+  @spec view() :: Macro.t()
+  def view do
+    quote do
+      import Phoenix.View
+
+      alias HNAggregatorWeb.Router.Helpers, as: Routes
+    end
+  end
+
   @spec router() :: Macro.t()
   def router do
     quote do
@@ -19,15 +28,6 @@ defmodule HNAggregatorWeb do
 
       import Plug.Conn
       import Phoenix.Controller
-    end
-  end
-
-  @spec view() :: Macro.t()
-  def view do
-    quote do
-      import Phoenix.View
-
-      alias HNAggregatorWeb.Router.Helpers, as: Routes
     end
   end
 
