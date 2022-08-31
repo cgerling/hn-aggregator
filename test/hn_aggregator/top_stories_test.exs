@@ -59,7 +59,8 @@ defmodule HNAggregator.TopStoriesTest do
 
   describe "watch/0" do
     test "should register current process as a watcher" do
-      assert :ok == TopStories.watch()
+      assert {:ok, watch_ref} = TopStories.watch()
+      assert is_reference(watch_ref)
 
       watchers = TopStories.watchers()
 

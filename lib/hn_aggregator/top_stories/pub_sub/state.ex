@@ -19,17 +19,19 @@ defmodule HNAggregator.TopStories.PubSub.State do
     }
   end
 
-  @spec watch(t(), Process.dest()) :: t()
+  @spec watch(t(), Process.dest()) :: {reference(), t()}
   def watch(%__MODULE__{} = state, process) do
-    already_watching? = Enum.any?(state.watchers, fn {watcher, _} -> process == watcher end)
+    watcher = Enum.find(state.watchers, fn {watcher, _} -> process == watcher end)
 
-    if already_watching? do
-      state
+    if watcher != nil do
+      {_, watch_ref} = watcher
+      {watch_ref, state}
     else
       monitor_ref = Process.monitor(process)
       new_watcher = {process, monitor_ref}
 
-      %{state | watchers: [new_watcher | state.watchers]}
+      state = %{state | watchers: [new_watcher | state.watchers]}
+      {monitor_ref, state}
     end
   end
 

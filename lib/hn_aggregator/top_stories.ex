@@ -24,7 +24,7 @@ defmodule HNAggregator.TopStories do
     GenServer.call(@pub_sub, {:publish_change, top_stories})
   end
 
-  @spec watch() :: :ok
+  @spec watch() :: {:ok, reference}
   def watch do
     GenServer.call(@pub_sub, :watch)
   end

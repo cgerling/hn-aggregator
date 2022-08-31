@@ -20,9 +20,10 @@ defmodule HNAggregator.TopStories.PubSub do
 
   @impl GenServer
   def handle_call(:watch, {from_pid, _}, state) do
-    state = State.watch(state, from_pid)
+    {watch_ref, state} = State.watch(state, from_pid)
+    reply = {:ok, watch_ref}
 
-    {:reply, :ok, state}
+    {:reply, reply, state}
   end
 
   def handle_call({:publish_change, data}, _from, state) do

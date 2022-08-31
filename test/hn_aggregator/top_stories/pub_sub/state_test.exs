@@ -13,14 +13,15 @@ defmodule HNAggregator.TopStories.PubSub.StateTest do
   end
 
   describe "watch/2" do
-    test "should return a new state with the given process as a watcher" do
+    test "should return a reference a the new state with the given process as a watcher" do
       state = State.new()
       process = spawn(fn -> Process.sleep(100) end)
-      state = State.watch(state, process)
+      {watch_ref, state} = State.watch(state, process)
 
+      assert is_reference(watch_ref)
       assert [{watcher, monitor_ref}] = state.watchers
       assert watcher == process
-      assert is_reference(monitor_ref)
+      assert monitor_ref == watch_ref
     end
 
     test "should create a monitor reference off the given process" do
@@ -35,10 +36,8 @@ defmodule HNAggregator.TopStories.PubSub.StateTest do
       state = State.new()
       process = spawn(fn -> Process.sleep(1000) end)
 
-      state =
-        state
-        |> State.watch(process)
-        |> State.watch(process)
+      {_, state} = State.watch(state, process)
+      {_, state} = State.watch(state, process)
 
       assert State.watchers(state) == [process]
     end
@@ -48,10 +47,9 @@ defmodule HNAggregator.TopStories.PubSub.StateTest do
     test "should return a new state with the given process removed from watchers" do
       state = State.new()
       process = spawn(fn -> Process.sleep(100) end)
-      state = State.watch(state, process)
+      {watch_ref, state} = State.watch(state, process)
 
-      [{_, monitor_ref}] = state.watchers
-      state = State.unwatch(state, monitor_ref)
+      state = State.unwatch(state, watch_ref)
 
       assert state.watchers == []
     end
@@ -61,7 +59,7 @@ defmodule HNAggregator.TopStories.PubSub.StateTest do
     test "should send a message for all current watchers" do
       state = State.new()
       process = self()
-      state = State.watch(state, process)
+      {_, state} = State.watch(state, process)
 
       State.publish_change(state, "test message")
 
@@ -73,7 +71,7 @@ defmodule HNAggregator.TopStories.PubSub.StateTest do
     test "should return a list with all processes registered as watchers" do
       state = State.new()
       process = self()
-      state = State.watch(state, process)
+      {_, state} = State.watch(state, process)
 
       assert State.watchers(state) == [process]
     end
