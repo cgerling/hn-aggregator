@@ -37,6 +37,13 @@ defmodule HNAggregator.TopStories.PubSub.State do
 
   @spec unwatch(t(), reference()) :: t()
   def unwatch(%__MODULE__{} = state, reference) do
+    watch = Enum.find(state.watchers, fn {_process, monitor_ref} -> monitor_ref == reference end)
+
+    unless watch == nil do
+      {_, watch_ref} = watch
+      Process.demonitor(watch_ref)
+    end
+
     watchers =
       Enum.reject(state.watchers, fn {_process, monitor_ref} -> monitor_ref == reference end)
 

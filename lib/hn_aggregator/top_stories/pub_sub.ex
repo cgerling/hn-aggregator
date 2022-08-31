@@ -26,6 +26,12 @@ defmodule HNAggregator.TopStories.PubSub do
     {:reply, reply, state}
   end
 
+  def handle_call({:unwatch, watch_ref}, _from, state) do
+    state = State.unwatch(state, watch_ref)
+
+    {:reply, :ok, state}
+  end
+
   def handle_call({:publish_change, data}, _from, state) do
     state = State.publish_change(state, data)
 

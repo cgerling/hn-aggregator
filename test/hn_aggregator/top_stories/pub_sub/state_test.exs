@@ -53,6 +53,16 @@ defmodule HNAggregator.TopStories.PubSub.StateTest do
 
       assert state.watchers == []
     end
+
+    test "should remove monitor reference of the given process" do
+      state = State.new()
+      process = spawn(fn -> Process.sleep(100) end)
+      {watch_ref, state} = State.watch(state, process)
+
+      State.unwatch(state, watch_ref)
+
+      assert Process.info(process, :monitored_by) == {:monitored_by, []}
+    end
   end
 
   describe "publish/2" do

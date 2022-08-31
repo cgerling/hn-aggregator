@@ -29,6 +29,11 @@ defmodule HNAggregator.TopStories do
     GenServer.call(@pub_sub, :watch)
   end
 
+  @spec unwatch(reference()) :: :ok
+  def unwatch(watch_ref) when is_reference(watch_ref) do
+    GenServer.call(@pub_sub, {:unwatch, watch_ref})
+  end
+
   @spec watchers() :: list(Process.dest())
   def watchers do
     GenServer.call(@pub_sub, :watchers)

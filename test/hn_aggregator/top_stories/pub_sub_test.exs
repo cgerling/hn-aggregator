@@ -18,6 +18,18 @@ defmodule HNAggregator.TopStories.PubSubTest do
     assert %State{watchers: [{^process, _monitor_ref}]} = :sys.get_state(pub_sub)
   end
 
+  test "should remove client from wathers list", %{pub_sub: pub_sub} do
+    spawn(fn ->
+      {:ok, watch_ref} = GenServer.call(pub_sub, :watch)
+      GenServer.call(pub_sub, {:unwatch, watch_ref})
+      Process.sleep(1000)
+    end)
+
+    Process.sleep(50)
+
+    assert :sys.get_state(pub_sub) == State.new()
+  end
+
   test "should send a message to all registered watchers", %{pub_sub: pub_sub} do
     GenServer.call(pub_sub, :watch)
     GenServer.call(pub_sub, {:publish_change, "test message"})
