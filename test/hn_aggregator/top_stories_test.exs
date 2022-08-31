@@ -4,14 +4,13 @@ defmodule HNAggregator.TopStoriesTest do
   alias HNAggregator.Factory
   alias HNAggregator.HackerNews.Item
   alias HNAggregator.TopStories
-  alias HNAggregator.TopStories.PubSub
 
   @top_stories Enum.map(1..10, &Factory.build(:item, id: &1, type: "story"))
 
   setup_all do
-    PubSub.publish(@top_stories)
+    TopStories.update_stories(@top_stories)
 
-    on_exit(fn -> PubSub.publish([]) end)
+    on_exit(fn -> TopStories.update_stories([]) end)
     :ok
   end
 
@@ -45,6 +44,47 @@ defmodule HNAggregator.TopStoriesTest do
       story = TopStories.get(id)
 
       assert is_nil(story)
+    end
+  end
+
+  describe "update_stories/1" do
+    test "should send a message to all registered watchers" do
+      TopStories.watch()
+
+      stories = @top_stories
+      assert TopStories.update_stories(stories) == :ok
+      assert_receive {:pub_sub, {:message, ^stories}}
+    end
+  end
+
+  describe "watch/0" do
+    test "should register current process as a watcher" do
+      assert :ok == TopStories.watch()
+
+      watchers = TopStories.watchers()
+
+      assert Enum.any?(watchers, &(&1 == self()))
+    end
+  end
+
+  describe "watchers/0" do
+    test "should return all processes registered as watchers" do
+      watch_fn = fn ->
+        TopStories.watch()
+        Process.sleep(1000)
+      end
+
+      process_a = spawn(watch_fn)
+      process_b = spawn(watch_fn)
+
+      Process.sleep(50)
+
+      watchers = TopStories.watchers()
+      assert Enum.any?(watchers, &(&1 == process_a))
+      assert Enum.any?(watchers, &(&1 == process_b))
+
+      Process.exit(process_a, :kill)
+      Process.exit(process_b, :kill)
     end
   end
 end

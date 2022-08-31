@@ -5,8 +5,8 @@ defmodule HNAggregator.TopStories.PollerTest do
 
   alias HNAggregator.Factory
   alias HNAggregator.HackerNews
+  alias HNAggregator.TopStories
   alias HNAggregator.TopStories.Poller
-  alias HNAggregator.TopStories.PubSub
 
   setup do
     hacker_news_mod = Application.get_env(:hn_aggregator, :hacker_news)
@@ -33,7 +33,7 @@ defmodule HNAggregator.TopStories.PollerTest do
       {:ok, item}
     end)
 
-    PubSub.subscribe()
+    TopStories.watch()
 
     start_supervised!({Poller, name: context.test})
 
@@ -51,7 +51,7 @@ defmodule HNAggregator.TopStories.PollerTest do
       {:ok, item}
     end)
 
-    PubSub.subscribe()
+    TopStories.watch()
 
     rate = 200
     start_supervised!({Poller, name: context.test, rate: rate})

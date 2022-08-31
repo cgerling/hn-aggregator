@@ -2,14 +2,14 @@ defmodule HNAggregatorWeb.TopStoriesSocketTest do
   use ExUnit.Case, async: true
 
   alias HNAggregator.Factory
-  alias HNAggregator.TopStories.PubSub
+  alias HNAggregator.TopStories
   alias HNAggregatorWeb.TopStoriesSocket
 
   describe "init/1" do
     test "should subscribe to pub sub" do
       assert {:ok, %{}} = TopStoriesSocket.init(%{})
 
-      assert PubSub.listeners() |> Enum.any?(&(&1 == self()))
+      assert TopStories.watchers() |> Enum.any?(&(&1 == self()))
     end
 
     test "should send a push message to send current stories to client" do

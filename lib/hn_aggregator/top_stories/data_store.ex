@@ -9,8 +9,8 @@ defmodule HNAggregator.TopStories.DataStore do
 
   use GenServer
 
+  alias HNAggregator.TopStories
   alias HNAggregator.TopStories.DataStore.State
-  alias HNAggregator.TopStories.PubSub
 
   require Logger
 
@@ -22,7 +22,7 @@ defmodule HNAggregator.TopStories.DataStore do
 
   @impl GenServer
   def init(_) do
-    PubSub.subscribe()
+    TopStories.watch()
     state = State.new()
 
     {:ok, state}

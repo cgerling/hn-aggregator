@@ -5,8 +5,8 @@ defmodule HNAggregator.TopStories.Poller.StateTest do
 
   alias HNAggregator.Factory
   alias HNAggregator.HackerNews
+  alias HNAggregator.TopStories
   alias HNAggregator.TopStories.Poller.State
-  alias HNAggregator.TopStories.PubSub
 
   describe "new/1" do
     test "should return a state struct with default values" do
@@ -48,7 +48,7 @@ defmodule HNAggregator.TopStories.Poller.StateTest do
         {:ok, item}
       end)
 
-      PubSub.subscribe()
+      TopStories.watch()
 
       state = State.new([])
       State.fetch_data(state)

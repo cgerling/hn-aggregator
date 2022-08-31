@@ -3,9 +3,9 @@ defmodule HNAggregator.TopStories.DataStoreTest do
 
   alias HNAggregator.Factory
   alias HNAggregator.HackerNews.Item
+  alias HNAggregator.TopStories
   alias HNAggregator.TopStories.DataStore
   alias HNAggregator.TopStories.DataStore.State
-  alias HNAggregator.TopStories.PubSub
 
   setup context do
     name = context.test
@@ -16,14 +16,14 @@ defmodule HNAggregator.TopStories.DataStoreTest do
 
   test "should save into its state the data coming from the pub sub", %{data_store: data_store} do
     top_stories = Enum.map(1..10, fn _ -> Factory.build(:item) end)
-    PubSub.publish(top_stories)
+    TopStories.update_stories(top_stories)
 
     assert :sys.get_state(data_store) == State.new(top_stories)
   end
 
   test "should return all present stories", %{data_store: data_store} do
     top_stories = Enum.map(1..10, fn _ -> Factory.build(:item) end)
-    PubSub.publish(top_stories)
+    TopStories.update_stories(top_stories)
 
     assert GenServer.call(data_store, {:all, []}) == top_stories
   end
@@ -32,7 +32,7 @@ defmodule HNAggregator.TopStories.DataStoreTest do
     data_store: data_store
   } do
     top_stories = Enum.map(1..10, fn _ -> Factory.build(:item) end)
-    PubSub.publish(top_stories)
+    TopStories.update_stories(top_stories)
 
     stories = GenServer.call(data_store, {:all, limit: 4, offset: 6})
     assert stories == Enum.slice(top_stories, 6, 4)
@@ -40,7 +40,7 @@ defmodule HNAggregator.TopStories.DataStoreTest do
 
   test "should return a story with the given id", %{data_store: data_store} do
     top_stories = Enum.map(1..10, &Factory.build(:item, id: &1))
-    PubSub.publish(top_stories)
+    TopStories.update_stories(top_stories)
 
     id = :rand.uniform(10)
     story = GenServer.call(data_store, {:get, id})
@@ -51,7 +51,7 @@ defmodule HNAggregator.TopStories.DataStoreTest do
 
   test "should return nil when no story has the given id", %{data_store: data_store} do
     top_stories = []
-    PubSub.publish(top_stories)
+    TopStories.update_stories(top_stories)
 
     id = :rand.uniform(10)
     story = GenServer.call(data_store, {:get, id})

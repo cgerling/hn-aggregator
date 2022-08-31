@@ -5,7 +5,7 @@ defmodule HNAggregator.TopStories.Poller.State do
   """
 
   alias HNAggregator.HackerNews
-  alias HNAggregator.TopStories.PubSub
+  alias HNAggregator.TopStories
 
   @type t :: %__MODULE__{
           rate: pos_integer()
@@ -28,7 +28,7 @@ defmodule HNAggregator.TopStories.Poller.State do
   @spec fetch_data(t()) :: t()
   def fetch_data(%__MODULE__{} = state) do
     HackerNews.top_stories()
-    |> PubSub.publish()
+    |> TopStories.update_stories()
 
     Process.send_after(self(), :fetch_data, state.rate)
 

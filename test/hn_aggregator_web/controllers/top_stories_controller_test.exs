@@ -2,13 +2,13 @@ defmodule HNAggregatorWeb.TopStoriesControllerTest do
   use HNAggregatorWeb.ConnCase, async: true
 
   alias HNAggregator.Factory
-  alias HNAggregator.TopStories.PubSub
+  alias HNAggregator.TopStories
 
   setup do
     top_stories = Enum.map(1..50, fn id -> Factory.build(:item, id: id, type: "story") end)
-    PubSub.publish(top_stories)
+    TopStories.update_stories(top_stories)
 
-    on_exit(fn -> PubSub.publish([]) end)
+    on_exit(fn -> TopStories.update_stories([]) end)
 
     :ok
   end
