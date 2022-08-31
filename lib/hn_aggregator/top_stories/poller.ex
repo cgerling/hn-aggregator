@@ -13,8 +13,6 @@ defmodule HNAggregator.TopStories.Poller do
 
   alias HNAggregator.TopStories.Poller.State
 
-  require Logger
-
   @spec start_link(Keyword.t()) :: GenServer.on_start()
   def start_link(options) do
     name = Keyword.get(options, :name, __MODULE__)
@@ -37,9 +35,7 @@ defmodule HNAggregator.TopStories.Poller do
     {:noreply, state}
   end
 
-  def handle_info(message, state) do
-    Logger.info("#{__MODULE__} received an unexpected message: #{inspect(message)}")
-
+  def handle_info(_message, state) do
     {:noreply, state}
   end
 end
