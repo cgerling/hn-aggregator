@@ -8,14 +8,14 @@ defmodule HNAggregator.TopStories do
   @data_store HNAggregator.TopStories.DataStore
   @pub_sub HNAggregator.TopStories.PubSub
 
-  @spec all() :: list(Item.t())
-  @spec all(Keyword.t()) :: list(Item.t())
-  def all(options \\ []) when is_list(options) do
+  @spec all_stories() :: list(Item.t())
+  @spec all_stories(Keyword.t()) :: list(Item.t())
+  def all_stories(options \\ []) when is_list(options) do
     GenServer.call(@data_store, {:all, options})
   end
 
-  @spec get(pos_integer()) :: Item.t() | nil
-  def get(id) when is_integer(id) and id > 0 do
+  @spec get_story(pos_integer()) :: Item.t() | nil
+  def get_story(id) when is_integer(id) and id > 0 do
     GenServer.call(@data_store, {:get, id})
   end
 
@@ -24,13 +24,13 @@ defmodule HNAggregator.TopStories do
     GenServer.call(@pub_sub, {:publish_change, top_stories})
   end
 
-  @spec watch() :: {:ok, reference}
-  def watch do
+  @spec watch_stories() :: {:ok, reference}
+  def watch_stories do
     GenServer.call(@pub_sub, :watch)
   end
 
-  @spec unwatch(reference()) :: :ok
-  def unwatch(watch_ref) when is_reference(watch_ref) do
+  @spec unwatch_stories(reference()) :: :ok
+  def unwatch_stories(watch_ref) when is_reference(watch_ref) do
     GenServer.call(@pub_sub, {:unwatch, watch_ref})
   end
 

@@ -48,7 +48,7 @@ defmodule HNAggregator.TopStories.Poller.StateTest do
         {:ok, item}
       end)
 
-      TopStories.watch()
+      TopStories.watch_stories()
 
       state = State.new([])
       State.fetch_data(state)

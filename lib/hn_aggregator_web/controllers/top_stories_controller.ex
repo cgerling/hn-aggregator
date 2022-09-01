@@ -12,7 +12,7 @@ defmodule HNAggregatorWeb.TopStoriesController do
   def index(conn, params) do
     page = params |> Map.get("page", "1") |> String.to_integer()
     offset = (page - 1) * @page_size
-    top_stories = TopStories.all(limit: @page_size, offset: offset)
+    top_stories = TopStories.all_stories(limit: @page_size, offset: offset)
 
     conn
     |> put_status(:ok)
@@ -23,7 +23,7 @@ defmodule HNAggregatorWeb.TopStoriesController do
   def show(conn, params) do
     id = params |> Map.fetch!("id") |> String.to_integer()
 
-    with %Item{} = story <- TopStories.get(id) do
+    with %Item{} = story <- TopStories.get_story(id) do
       conn
       |> put_status(:ok)
       |> render("show.json", story: story)

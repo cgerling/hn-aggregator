@@ -14,9 +14,9 @@ defmodule HNAggregator.TopStoriesTest do
     :ok
   end
 
-  describe "all/0" do
+  describe "all_stories/0" do
     test "should return all present stories" do
-      stories = TopStories.all()
+      stories = TopStories.all_stories()
 
       assert stories == @top_stories
     end
@@ -24,16 +24,16 @@ defmodule HNAggregator.TopStoriesTest do
 
   describe "all/1" do
     test "should return stories paginated with the given limit and offset" do
-      stories = TopStories.all(limit: 2, offset: 4)
+      stories = TopStories.all_stories(limit: 2, offset: 4)
 
       assert stories == Enum.slice(@top_stories, 4, 2)
     end
   end
 
-  describe "get/1" do
+  describe "get_story/1" do
     test "should return a story with the given id" do
       id = :rand.uniform(10)
-      story = TopStories.get(id)
+      story = TopStories.get_story(id)
 
       assert %Item{} = story
       assert story == Enum.at(@top_stories, id - 1)
@@ -41,7 +41,7 @@ defmodule HNAggregator.TopStoriesTest do
 
     test "should return nil when no story has the given id" do
       id = 11
-      story = TopStories.get(id)
+      story = TopStories.get_story(id)
 
       assert is_nil(story)
     end
@@ -49,7 +49,7 @@ defmodule HNAggregator.TopStoriesTest do
 
   describe "update_stories/1" do
     test "should send a message to all registered watchers" do
-      TopStories.watch()
+      TopStories.watch_stories()
 
       stories = @top_stories
       assert TopStories.update_stories(stories) == :ok
@@ -57,9 +57,9 @@ defmodule HNAggregator.TopStoriesTest do
     end
   end
 
-  describe "watch/0" do
+  describe "watch_stories/0" do
     test "should register current process as a watcher" do
-      assert {:ok, watch_ref} = TopStories.watch()
+      assert {:ok, watch_ref} = TopStories.watch_stories()
       assert is_reference(watch_ref)
 
       watchers = TopStories.watchers()
@@ -68,10 +68,10 @@ defmodule HNAggregator.TopStoriesTest do
     end
   end
 
-  describe "unwatch/1" do
+  describe "unwatch_stories/1" do
     test "should remove current process as a watcher" do
-      {:ok, watch_ref} = TopStories.watch()
-      assert :ok == TopStories.unwatch(watch_ref)
+      {:ok, watch_ref} = TopStories.watch_stories()
+      assert :ok == TopStories.unwatch_stories(watch_ref)
 
       watchers = TopStories.watchers()
       refute Enum.any?(watchers, &(&1 == self()))
@@ -81,7 +81,7 @@ defmodule HNAggregator.TopStoriesTest do
   describe "watchers/0" do
     test "should return all processes registered as watchers" do
       watch_fn = fn ->
-        TopStories.watch()
+        TopStories.watch_stories()
         Process.sleep(1000)
       end
 

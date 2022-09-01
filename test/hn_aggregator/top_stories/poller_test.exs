@@ -33,7 +33,7 @@ defmodule HNAggregator.TopStories.PollerTest do
       {:ok, item}
     end)
 
-    TopStories.watch()
+    TopStories.watch_stories()
 
     start_supervised!({Poller, name: context.test})
 
@@ -51,7 +51,7 @@ defmodule HNAggregator.TopStories.PollerTest do
       {:ok, item}
     end)
 
-    TopStories.watch()
+    TopStories.watch_stories()
 
     rate = 200
     start_supervised!({Poller, name: context.test, rate: rate})

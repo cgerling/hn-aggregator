@@ -22,7 +22,7 @@ defmodule HNAggregator.TopStories.DataStore do
 
   @impl GenServer
   def init(_) do
-    TopStories.watch()
+    TopStories.watch_stories()
     state = State.new()
 
     {:ok, state}
