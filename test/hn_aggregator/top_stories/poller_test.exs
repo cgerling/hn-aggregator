@@ -1,12 +1,15 @@
 defmodule HNAggregator.TopStories.PollerTest do
   use ExUnit.Case, async: false
 
+  import ExUnit.CaptureLog
   import Mox
 
   alias HNAggregator.Factory
   alias HNAggregator.HackerNews
   alias HNAggregator.TopStories
   alias HNAggregator.TopStories.Poller
+
+  @moduletag :capture_log
 
   setup do
     hacker_news_mod = Application.get_env(:hn_aggregator, :hacker_news)
@@ -38,6 +41,34 @@ defmodule HNAggregator.TopStories.PollerTest do
     start_supervised!({Poller, name: context.test})
 
     assert_receive {:watch, {:top_stories, _}}
+  end
+
+  test "should log at the start and end of the fetch process", context do
+    top_stories = Enum.map(1..10, &Factory.build(:item, id: &1, type: "story"))
+
+    expect(HackerNews.Mock, :top_stories, 1, fn ->
+      top_stories = Enum.to_list(1..10)
+      {:ok, top_stories}
+    end)
+
+    expect(HackerNews.Mock, :item, 10, fn id ->
+      item = Enum.at(top_stories, id - 1)
+      {:ok, item}
+    end)
+
+    TopStories.watch_stories()
+
+    logs =
+      capture_log(fn ->
+        start_supervised!({Poller, name: context.test})
+
+        assert_receive {:watch, {:top_stories, _}}
+
+        stop_supervised!(Poller)
+      end)
+
+    assert logs =~ "Fetching current top stories from Hacker News"
+    assert logs =~ "Fetching process finished after "
   end
 
   test "should fetch new top stories after the configured rate interval", context do
