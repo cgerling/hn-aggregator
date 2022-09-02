@@ -1,6 +1,4 @@
 defmodule HNAggregatorWeb do
-  @moduledoc false
-
   @spec controller() :: Macro.t()
   def controller do
     quote do

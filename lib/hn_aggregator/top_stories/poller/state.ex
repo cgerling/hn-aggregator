@@ -1,9 +1,4 @@
 defmodule HNAggregator.TopStories.Poller.State do
-  @moduledoc """
-  Module to define the state of the `HNAggregator.TopStories.Poller` process
-  as well as functions to interact with such state.
-  """
-
   alias HNAggregator.HackerNews
   alias HNAggregator.TopStories
 

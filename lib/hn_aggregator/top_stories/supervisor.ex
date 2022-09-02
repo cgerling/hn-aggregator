@@ -1,6 +1,4 @@
 defmodule HNAggregator.TopStories.Supervisor do
-  @moduledoc false
-
   use Supervisor
 
   alias HNAggregator.TopStories

@@ -1,6 +1,4 @@
 defmodule HNAggregatorWeb.ConnCase do
-  @moduledoc false
-
   use ExUnit.CaseTemplate
 
   using do

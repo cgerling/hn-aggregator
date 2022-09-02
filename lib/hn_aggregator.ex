@@ -1,6 +1,4 @@
 defmodule HNAggregator do
-  @moduledoc false
-
   use Application
 
   @impl Application

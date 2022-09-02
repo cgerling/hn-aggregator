@@ -1,9 +1,4 @@
 defmodule HNAggregator.TopStories.DataStore.State do
-  @moduledoc """
-  Module to define the state of the `HNAggregator.TopStories.DataStore` process
-  as well as functions to interact with such state.
-  """
-
   alias HNAggregator.HackerNews.Item
 
   @type t() :: %__MODULE__{

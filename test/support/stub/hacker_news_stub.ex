@@ -1,6 +1,4 @@
 defmodule HNAggregator.HackerNewsStub do
-  @moduledoc false
-
   @behaviour HNAggregator.HackerNews.Behaviour
 
   alias HNAggregator.Factory
