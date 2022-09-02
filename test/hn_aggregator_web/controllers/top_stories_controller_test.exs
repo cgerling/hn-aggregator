@@ -85,7 +85,7 @@ defmodule HNAggregatorWeb.TopStoriesControllerTest do
                |> get(Routes.top_stories_path(conn, :show, id))
                |> json_response(:not_found)
 
-      assert response["message"] == "Not Found"
+      assert response["message"] == "No top story was found with id=#{id}"
     end
   end
 end

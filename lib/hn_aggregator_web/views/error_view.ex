@@ -2,8 +2,9 @@ defmodule HNAggregatorWeb.ErrorView do
   use HNAggregatorWeb, :view
 
   @spec render(String.t(), map()) :: map()
-  def render("404.json", _assigns) do
-    %{message: "Not Found"}
+  def render("404.json", assigns) do
+    message = Map.get(assigns, :message, "Not Found")
+    %{message: message}
   end
 
   def render("500.json", _assigns) do
