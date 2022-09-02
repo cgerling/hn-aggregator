@@ -54,7 +54,7 @@ not specified it defaults to the first page.
 404 Not Found
 
 {
-  "message": "Not Found"
+  "message": "No top story was found with id={id}"
 }
 ```
 
