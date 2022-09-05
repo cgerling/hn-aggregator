@@ -1,15 +1,17 @@
 defmodule HNAggregator.TopStories.PubSub.State do
   @type watcher :: {Process.dest(), reference()}
   @type t :: %__MODULE__{
+          last_change: term(),
           watchers: list(watcher())
         }
 
-  @enforce_keys [:watchers]
+  @enforce_keys [:last_change, :watchers]
   defstruct @enforce_keys
 
   @spec new() :: t()
   def new do
     %__MODULE__{
+      last_change: nil,
       watchers: []
     }
   end
@@ -24,6 +26,10 @@ defmodule HNAggregator.TopStories.PubSub.State do
     else
       monitor_ref = Process.monitor(process)
       new_watcher = {process, monitor_ref}
+
+      unless state.last_change == nil do
+        send_change(process, state.last_change)
+      end
 
       state = %{state | watchers: [new_watcher | state.watchers]}
       {monitor_ref, state}
@@ -52,7 +58,7 @@ defmodule HNAggregator.TopStories.PubSub.State do
       send_change(process, data)
     end)
 
-    state
+    %{state | last_change: data}
   end
 
   @spec send_change(Process.dest(), term()) :: :ok

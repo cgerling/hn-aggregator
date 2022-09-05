@@ -41,6 +41,24 @@ defmodule HNAggregator.TopStories.PubSub.StateTest do
 
       assert State.watchers(state) == [process]
     end
+
+    test "should send a message with the last published change" do
+      state = State.new()
+      state = State.publish_change(state, "last published change")
+
+      State.watch(state, self())
+      last_change = state.last_change
+      assert_receive {:watch, {:top_stories, ^last_change}}
+    end
+
+    test "should not send a message with the last published change when no change was published yet" do
+      state = State.new()
+
+      State.watch(state, self())
+      Process.sleep(100)
+
+      assert Process.info(self(), :messages) == {:messages, []}
+    end
   end
 
   describe "unwatch/2" do
@@ -74,6 +92,16 @@ defmodule HNAggregator.TopStories.PubSub.StateTest do
       State.publish_change(state, "test message")
 
       assert_received {:watch, {:top_stories, "test message"}}
+    end
+
+    test "should return a new state with the given change as the last change" do
+      state = State.new()
+      process = self()
+      {_, state} = State.watch(state, process)
+
+      state = State.publish_change(state, "test message")
+
+      assert state.last_change == "test message"
     end
   end
 
