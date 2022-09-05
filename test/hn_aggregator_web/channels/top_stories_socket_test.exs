@@ -11,12 +11,6 @@ defmodule HNAggregatorWeb.TopStoriesSocketTest do
 
       assert TopStories.watchers() |> Enum.any?(&(&1 == self()))
     end
-
-    test "should send a push message to send current stories to client" do
-      TopStoriesSocket.init(%{})
-
-      assert_receive {:push, top_stories} when is_list(top_stories)
-    end
   end
 
   describe "handle_in/2" do
@@ -28,16 +22,9 @@ defmodule HNAggregatorWeb.TopStoriesSocketTest do
   end
 
   describe "handle_info/2" do
-    test "should send a push message to send new stories to client when top stories are updated" do
+    test "should send new stories to client when top stories are updated" do
       story = Factory.build(:item, type: "story")
-      TopStoriesSocket.handle_info({:watch, {:top_stories, [story]}}, %{})
-
-      assert_receive {:push, [^story]}
-    end
-
-    test "should push message to client when receive push message" do
-      story = Factory.build(:item, type: "story")
-      reply = TopStoriesSocket.handle_info({:push, [story]}, %{})
+      reply = TopStoriesSocket.handle_info({:watch, {:top_stories, [story]}}, %{})
 
       message =
         "[{\"by\":\"#{story.by}\",\"descendants\":#{story.descendants},\"id\":#{story.id},\"score\":#{story.score},\"time\":\"#{DateTime.to_iso8601(story.time)}\",\"title\":\"#{story.title}\",\"url\":\"#{story.url}\"}]"

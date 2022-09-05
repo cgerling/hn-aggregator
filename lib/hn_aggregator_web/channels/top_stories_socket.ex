@@ -19,9 +19,6 @@ defmodule HNAggregatorWeb.TopStoriesSocket do
   def init(_state) do
     {:ok, watch_ref} = TopStories.watch_stories()
 
-    TopStories.all_stories()
-    |> push()
-
     {:ok, %{watch_ref: watch_ref}}
   end
 
@@ -32,12 +29,6 @@ defmodule HNAggregatorWeb.TopStoriesSocket do
 
   @impl Transport
   def handle_info({:watch, {:top_stories, top_stories}}, state) do
-    push(top_stories)
-
-    {:ok, state}
-  end
-
-  def handle_info({:push, top_stories}, state) do
     message =
       "index.json"
       |> TopStoriesView.render(%{top_stories: top_stories})
@@ -48,10 +39,6 @@ defmodule HNAggregatorWeb.TopStoriesSocket do
 
   def handle_info(_message, state) do
     {:ok, state}
-  end
-
-  defp push(top_stories) do
-    send(self(), {:push, top_stories})
   end
 
   @impl Transport
