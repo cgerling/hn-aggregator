@@ -40,7 +40,7 @@ defmodule HNAggregator.TopStories.PollerTest do
 
     start_supervised!({Poller, name: context.test})
 
-    assert_receive {:watch, {:top_stories, _}}
+    assert_receive {:watch, {:top_stories, ^top_stories}}
   end
 
   test "should log at the start and end of the fetch process", context do
@@ -62,7 +62,8 @@ defmodule HNAggregator.TopStories.PollerTest do
       capture_log(fn ->
         start_supervised!({Poller, name: context.test})
 
-        assert_receive {:watch, {:top_stories, _}}
+        Process.sleep(10)
+        assert_receive {:watch, {:top_stories, ^top_stories}}
 
         stop_supervised!(Poller)
       end)
@@ -72,13 +73,15 @@ defmodule HNAggregator.TopStories.PollerTest do
   end
 
   test "should fetch new top stories after the configured rate interval", context do
+    top_stories = Enum.map(1..10, &Factory.build(:item, id: &1, type: "story"))
+
     expect(HackerNews.Mock, :top_stories, 2, fn ->
       top_stories = Enum.to_list(1..10)
       {:ok, top_stories}
     end)
 
     expect(HackerNews.Mock, :item, 20, fn id ->
-      item = Factory.build(:item, id: id, type: "story")
+      item = Enum.at(top_stories, id - 1)
       {:ok, item}
     end)
 
@@ -87,10 +90,10 @@ defmodule HNAggregator.TopStories.PollerTest do
     rate = 200
     start_supervised!({Poller, name: context.test, rate: rate})
 
-    assert_receive {:watch, {:top_stories, _}}
+    assert_receive {:watch, {:top_stories, ^top_stories}}
 
     Process.sleep(rate)
 
-    assert_receive {:watch, {:top_stories, _}}
+    assert_receive {:watch, {:top_stories, ^top_stories}}
   end
 end
