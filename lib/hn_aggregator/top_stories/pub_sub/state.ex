@@ -49,10 +49,19 @@ defmodule HNAggregator.TopStories.PubSub.State do
   @spec publish_change(t(), term()) :: t()
   def publish_change(%__MODULE__{} = state, data) do
     Enum.each(state.watchers, fn {process, _} ->
-      send(process, {:watch, {:top_stories, data}})
+      send_change(process, data)
     end)
 
     state
+  end
+
+  @spec send_change(Process.dest(), term()) :: :ok
+  defp send_change(process, data) do
+    message = {:watch, {:top_stories, data}}
+
+    send(process, message)
+
+    :ok
   end
 
   @spec watchers(t()) :: list(Process.dest())
