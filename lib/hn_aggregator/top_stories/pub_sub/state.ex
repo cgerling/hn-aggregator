@@ -32,15 +32,16 @@ defmodule HNAggregator.TopStories.PubSub.State do
 
   @spec unwatch(t(), reference()) :: t()
   def unwatch(%__MODULE__{} = state, reference) do
-    watch = Enum.find(state.watchers, fn {_process, monitor_ref} -> monitor_ref == reference end)
+    find_process_by_ref = fn {_process, monitor_ref} -> monitor_ref == reference end
+
+    watch = Enum.find(state.watchers, find_process_by_ref)
 
     unless watch == nil do
       {_, watch_ref} = watch
       Process.demonitor(watch_ref)
     end
 
-    watchers =
-      Enum.reject(state.watchers, fn {_process, monitor_ref} -> monitor_ref == reference end)
+    watchers = Enum.reject(state.watchers, find_process_by_ref)
 
     %{state | watchers: watchers}
   end
