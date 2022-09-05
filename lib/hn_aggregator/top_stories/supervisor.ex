@@ -1,6 +1,7 @@
 defmodule HNAggregator.TopStories.Supervisor do
   use Supervisor
 
+  alias HNAggregator.Pool
   alias HNAggregator.TopStories
 
   @spec start_link(term()) :: Supervisor.on_start()
@@ -13,7 +14,8 @@ defmodule HNAggregator.TopStories.Supervisor do
     children = [
       TopStories.PubSub,
       TopStories.Poller,
-      TopStories.DataStore
+      {Pool.Supervisor,
+       worker: {TopStories.DataStore, name: nil}, size: 5, name: TopStories.DataStore.Pool}
     ]
 
     opts = [strategy: :one_for_one]

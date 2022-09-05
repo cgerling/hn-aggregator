@@ -4,19 +4,22 @@ defmodule HNAggregator.TopStories do
   """
 
   alias HNAggregator.HackerNews.Item
+  alias HNAggregator.Pool
 
-  @data_store HNAggregator.TopStories.DataStore
+  @data_store_pool HNAggregator.TopStories.DataStore.Pool
   @pub_sub HNAggregator.TopStories.PubSub
 
   @spec all_stories() :: list(Item.t())
   @spec all_stories(Keyword.t()) :: list(Item.t())
   def all_stories(options \\ []) when is_list(options) do
-    GenServer.call(@data_store, {:all, options})
+    data_store = Pool.fetch_worker(@data_store_pool)
+    GenServer.call(data_store, {:all, options})
   end
 
   @spec get_story(pos_integer()) :: Item.t() | nil
   def get_story(id) when is_integer(id) and id > 0 do
-    GenServer.call(@data_store, {:get, id})
+    data_store = Pool.fetch_worker(@data_store_pool)
+    GenServer.call(data_store, {:get, id})
   end
 
   @spec update_stories(list(Item.t())) :: :ok
