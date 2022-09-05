@@ -1,7 +1,10 @@
 defmodule HNAggregatorWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :hn_aggregator
 
-  socket "/top-stories", HNAggregatorWeb.TopStoriesSocket, websocket: [path: "/ws"]
+  @timeout_10mins 10 * 60 * 1000
+
+  socket "/top-stories", HNAggregatorWeb.TopStoriesSocket,
+    websocket: [path: "/ws", timeout: @timeout_10mins]
 
   plug Plug.Parsers,
     parsers: [:json],
